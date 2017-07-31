@@ -3,6 +3,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.BufferedWriter;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.swing.*;
 
@@ -11,47 +14,51 @@ enum Mode{
 	PVSC,CVSC;
 }
 
-public class NewGame{//ĞÂÓÎÏ·µÄ¶¨Òå£º¸ø¶¨ÁË³õÊ¼×´Ì¬ºÍÏÈÊÖ£¬¾Í¿ÉÒÔ³ÆÖ®ÎªĞÂÓÎÏ·£¬²»Ò»¶¨±ØĞë´Ó¿ÕÆåÅÌ¿ªÊ¼
+public class NewGame{//æ–°æ¸¸æˆçš„å®šä¹‰ï¼šç»™å®šäº†åˆå§‹çŠ¶æ€å’Œå…ˆæ‰‹ï¼Œå°±å¯ä»¥ç§°ä¹‹ä¸ºæ–°æ¸¸æˆï¼Œä¸ä¸€å®šå¿…é¡»ä»ç©ºæ£‹ç›˜å¼€å§‹
 
-	//ºËĞÄ£º
-	public Mode mode;//train:Á½Ì¨¼ÆËã»ú½øĞĞ¶ÔÕ½
-	public State initState, currentState;//³õÊ¼×´Ì¬ºÍµ±Ç°×´Ì¬
-	public Player[] ply=new Player[2];//Á½¸ö²ÎÓëÕß£¬player[0]ÎªºÚ×Ó£¬player[1]Îª°××Ó
-	protected int initPlayer, currentPlayer;//¿ª¾Ö·½ºÍµ±Ç°·½¡£ºÍPlayerµÄË³Ğò¶ÔÓ¦
-	public static boolean[][] points=new boolean[Gomoku.Length][Gomoku.Length];//true:´ú±íÊÇ¿ÕµÄ£¬false´ú±í²»ÊÇ¿ÕµÄ
-	public static Point[][] scores=new Point[Gomoku.Length][Gomoku.Length];//Ã¿¸öÎ»ÖÃµÄĞÅÏ¢£»Ò»·½ÃæÀ´×ÔÒÑÓĞ¾­Ñé£¬ÁíÒ»·½ÃæÀ´×ÔËæ»úÑµÁ·
-	public static DrawPanel panel;//ÆåÅÌ»æÖÆ¹¤¾ß
+	//æ ¸å¿ƒï¼š
+	public Mode mode;//train:ä¸¤å°è®¡ç®—æœºè¿›è¡Œå¯¹æˆ˜
+	public State currentState;//åˆå§‹çŠ¶æ€å’Œå½“å‰çŠ¶æ€
+	public static Player[] ply=new Player[2];//ä¸¤ä¸ªå‚ä¸è€…ï¼Œplayer[0]ä¸ºé»‘å­ï¼Œplayer[1]ä¸ºç™½å­
+	protected int initPlayer, currentPlayer;//å¼€å±€æ–¹å’Œå½“å‰æ–¹ã€‚å’ŒPlayerçš„é¡ºåºå¯¹åº”
+//	public static int[][] currentState.rec=new int[Gomoku.Length][Gomoku.Length];//0:ä»£è¡¨æ˜¯ç©ºçš„ï¼Œ1:ä»£è¡¨æ˜¯é»‘å­ï¼Œ-1ä»£è¡¨æ˜¯ç™½å­
+	public static DrawPanel panel;//æ£‹ç›˜ç»˜åˆ¶å·¥å…·
 	private static JFrame f=new JFrame("Gomoku game");
 	public static int step=45;
+	public Evaluate eva;
+//	static ArrayList<Pos> steps=new ArrayList<Pos>();
+
 	
 	public NewGame(){
-		//³õÊ¼»¯£¬Ä¬ÈÏÎªÈË»ú¶ÔÕ½Ä£Ê½
+		//åˆå§‹åŒ–ï¼Œé»˜è®¤ä¸ºäººæœºå¯¹æˆ˜æ¨¡å¼
 		mode=mode.PVSC;
 		initPlayer=0;
 		currentPlayer=0;
-	//	initState.empty();//Çå¿ÕÆåÅÌ
-	//	this.setSize(720,700);
+		eva = new Evaluate();
+		currentState=new State();
+		currentState.empty();
+//		currentState.initState();
 		for(int i=0;i<Gomoku.Length;i++)
 			for(int j=0;j<Gomoku.Length;j++){
-				points[i][j]=true;
-				scores[i][j]=new Point();
+				currentState.rec[i][j]=0;
 			}
-		panel=new DrawPanel();
-		
-		panel.init();
-		
-		
-		
+		panel=new DrawPanel();	
+		ply[0]=new MTCT1(true);
+		ply[1]=new Human(false);
 	}
 	
-	//³õÊ¼»¯ÓÎÏ·£¬»­³öÆåÅÌ£¬È»ºó¼àÌı¸üĞÂÆåÅÌ
+	//åˆå§‹åŒ–æ¸¸æˆï¼Œç”»å‡ºæ£‹ç›˜ï¼Œç„¶åç›‘å¬æ›´æ–°æ£‹ç›˜
 	public void initGame(){
 		
 		panel.setBackground(Color.GRAY);
 		panel.setPreferredSize(new Dimension(NewGame.step*(Gomoku.Length+2),NewGame.step*(Gomoku.Length+2)));
+		currentState.empty();
+		currentState.initState();
 		panel.init();
+		
 		f.add(panel);
 		f.pack();
+		f.setLocation(400, 0);
 		f.setVisible(true);
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
@@ -60,78 +67,8 @@ public class NewGame{//ĞÂÓÎÏ·µÄ¶¨Òå£º¸ø¶¨ÁË³õÊ¼×´Ì¬ºÍÏÈÊÖ£¬¾Í¿ÉÒÔ³ÆÖ®ÎªĞÂÓÎÏ·£¬²
 		NewGame game=new NewGame();
 		game.initGame();
 	}
-	
-
-	
 }
 
-class DrawPanel extends JPanel{
-	private static final long serialVersionUID = 1L;
-	BufferedImage bi;
-	boolean isBlack=true;
-	Graphics2D g2;
-	JFrame frame;
-	public void paint(Graphics g){
-		super.paint(g);
-		g2=(Graphics2D)g;
-		g2.setColor(Color.BLACK);
-		for(int i=1;i<=Gomoku.Length;i+=1){
-			g2.drawLine(NewGame.step,i*NewGame.step,NewGame.step*Gomoku.Length,i*NewGame.step);
-			g2.drawLine(i*NewGame.step,NewGame.step,i*NewGame.step,NewGame.step*Gomoku.Length);
-		}
-		
-		
-		// ÆåÅÌÉÏµÄÎå¸ö¶¨Î»»ù±¾µã£¬Í¼ÖĞµÄĞ¡Ô²È¦
-		g2.setColor(Color.BLACK);
-		g2.fillOval(353,353,14,14);
-		g2.fillOval(218,218,14,14);
-		g2.fillOval(488,218,14,14);
-		g2.fillOval(488,488,14,14);
-		g2.fillOval(218,488,14,14);
-	}
-	
-	void putChess(int x,int y, boolean isBlack){
-		if(isBlack)
-			g2.setColor(Color.BLACK);
-		else 
-			g2.setColor(Color.WHITE);
-		g2.fillOval(x-NewGame.step/2,y-NewGame.step/2,NewGame.step,NewGame.step);
-		
-		
-		System.out.println("g2 has painted");
-	}
-	
-	int round(int x){
-		return ((x%NewGame.step)<(NewGame.step/2))?x/NewGame.step:(x/NewGame.step+1);
-	}
-	public void init(){
-		this.addMouseListener(new MouseAdapter() {
-			public void mouseClicked(MouseEvent e){
-				int x=round(e.getX()),y=round(e.getY());
-				
-				System.out.println(x+"and y:"+y);
-				
-				if(x>0 && x<=Gomoku.Length 
-						&& y>0 && y<=Gomoku.Length
-						&& NewGame.points[y][x]){
-					putChess(x*NewGame.step,y*NewGame.step,isBlack);
-				}
-				repaint();
-			}
-		});
-	}
-
-	
-}
-
-class Point {
-	int total,win;
-	
-	public Point(){
-		total=0;
-		win=0;
-	}
-}
 
 
 
