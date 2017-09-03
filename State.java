@@ -9,6 +9,9 @@ public class State {
 
 	public static int[][] rec= new int[Gomoku.Length][Gomoku.Length];//0:没有棋子；1：黑棋；-1：白棋
 	public static List<Step> steps = new LinkedList<>();
+	//*******Must i record the order of the steps??? I don't think so. What i need is the current arrangement and the last step's color (maybe the location to faciliate the imitation)
+	
+	
 	public static Set<Integer> availables = new HashSet<>();//存放当前的可供选择的结点
 	
 	public static void initState(){

@@ -173,9 +173,6 @@ public class AI {
 		return res;
 	}
 }
-class Node{
-	
-}
 class Pos{
 	int x,y;
 	public Pos(int _x,int _y){

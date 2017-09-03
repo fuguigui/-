@@ -35,6 +35,7 @@ public class DrawPanel extends JPanel{
 			g2.setColor(step.color);
 			g2.fillOval((step.x+1)*CHESS_SIZE - CHESS_SIZE / 2, (step.y+1)* CHESS_SIZE - CHESS_SIZE / 2, RADIUS, RADIUS);
 		}
+		//*****this for iteration can be changed. to iterate the current record is enough.
 		
 		
 		System.out.println("In DrawPanl.paint Display State.rec");

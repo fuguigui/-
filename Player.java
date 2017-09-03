@@ -5,12 +5,6 @@ abstract class Player {
 	public Player(boolean isblack){
 		isBlack = isblack;
 	}
-	
-	public int nextPoint(State curr){
-		
-		return 0;
-	}
-
 }
 
 class Human extends Player{
